@@ -1,0 +1,113 @@
+# Builds WT-MFD on GitHub's Windows machines and publishes a release.
+#
+# Push a tag to release:   git tag -s v0.1.0-preview -m "WT-MFD 0.1.0 preview" ; git push origin v0.1.0-preview
+#   -> installer + portable zip + SHA256SUMS.txt on a GitHub release (a prerelease when the version has a "-suffix").
+#      Release notes come from docs/release-notes/<tag>.md when that file exists.
+# Run it by hand (Actions tab -> Release -> Run workflow) to test a build: the files are kept as a
+# downloadable artifact on the run, and nothing is published.
+
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version to build, without the v (test build, not published)"
+        required: true
+        default: "0.0.0-test"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Version
+        id: v
+        run: |
+          $v = if ("${{ github.event_name }}" -eq "push") { "${{ github.ref_name }}".TrimStart("v") } else { "${{ inputs.version }}" }
+          if ($v -notmatch '^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$') { throw "Not a version: $v" }
+          "version=$v" >> $env:GITHUB_OUTPUT
+          "prerelease=$(if ($v.Contains('-')) { 'true' } else { 'false' })" >> $env:GITHUB_OUTPUT
+
+      # self-contained: users don't need to install .NET
+      - name: Publish the app
+        run: >
+          dotnet publish source/src/WT-MFD.csproj -c Release -r win-x64 --self-contained true
+          -p:PublishSingleFile=false -p:Version=${{ steps.v.outputs.version }} -o dist/WT-MFD/app
+
+      - name: Portable zip
+        run: |
+          $out = "dist/WT-MFD"
+          Copy-Item "Start MFD.cmd", README.md, CHANGELOG.md, installer/DISCLAIMER.txt $out
+          Copy-Item LICENSE "$out/LICENSE.txt"
+          Copy-Item streamdeck "$out/streamdeck" -Recurse
+          Compress-Archive -Path $out -DestinationPath "dist/WT-MFD-v${{ steps.v.outputs.version }}-portable-win-x64.zip"
+
+      - name: Installer
+        run: |
+          choco install innosetup --no-progress -y
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /DAppVersion=${{ steps.v.outputs.version }} installer\WT-MFD.iss
+          if ($LASTEXITCODE -ne 0) { throw "Inno Setup failed" }
+
+      # install, check, uninstall, check: the installer must work before anyone downloads it
+      - name: Test the installer
+        run: |
+          $setup = "dist/WT-MFD-Setup-v${{ steps.v.outputs.version }}-win-x64.exe"
+          $dir = Join-Path $env:LOCALAPPDATA "Programs\WT-MFD"
+          Start-Process $setup -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/LOG=dist\install.log" -Wait
+          foreach ($f in "WT-MFD.exe", "WT-MFD.dll", "settings.json", "LICENSE.txt", "DISCLAIMER.txt") {
+            if (-not (Test-Path (Join-Path $dir $f))) { Get-Content dist\install.log; throw "missing after install: $f" }
+          }
+          $uninstaller = Get-ChildItem $dir -Filter "unins*.exe" | Select-Object -First 1
+          Start-Process $uninstaller.FullName -ArgumentList "/VERYSILENT", "/SUPPRESSMSGBOXES", "/NORESTART" -Wait
+          Start-Sleep -Seconds 3
+          if (Test-Path (Join-Path $dir "WT-MFD.exe")) { throw "WT-MFD.exe still there after uninstall" }
+          Remove-Item dist\install.log -ErrorAction SilentlyContinue
+
+      - name: Checksums
+        run: |
+          Get-ChildItem dist -File | Where-Object { $_.Extension -in ".exe", ".zip" } | ForEach-Object {
+            "$((Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower())  $($_.Name)"
+          } | Set-Content dist/SHA256SUMS.txt -Encoding ascii
+          Get-Content dist/SHA256SUMS.txt
+
+      - name: Keep the files on the run
+        uses: actions/upload-artifact@v4
+        with:
+          name: WT-MFD-${{ steps.v.outputs.version }}
+          path: |
+            dist/*.exe
+            dist/*.zip
+            dist/SHA256SUMS.txt
+
+      - name: Publish the release
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $files = @(Get-ChildItem dist -File | Where-Object { $_.Extension -in ".exe", ".zip" -or $_.Name -eq "SHA256SUMS.txt" } | ForEach-Object FullName)
+          $notes = "docs/release-notes/$tag.md"
+          gh release view $tag *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag @files --clobber
+          } else {
+            $ghArgs = @($tag) + $files + @("--title", "WT-MFD ${{ steps.v.outputs.version }}", "--verify-tag")
+            if (Test-Path $notes) { $ghArgs += @("--notes-file", $notes) } else { $ghArgs += "--generate-notes" }
+            if ("${{ steps.v.outputs.prerelease }}" -eq "true") { $ghArgs += "--prerelease" }
+            gh release create @ghArgs
+          }
+          if ($LASTEXITCODE -ne 0) { throw "publishing failed" }

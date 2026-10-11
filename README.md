@@ -55,19 +55,27 @@ On every page, the header shows your aircraft, the page, the Air Simulator [rewa
 
 ### Requirements
 
-- Windows 10 or 11
+- Windows 10 or 11 (64-bit)
 - War Thunder
-- **.NET 8 runtime** (ASP.NET Core): `winget install Microsoft.DotNet.AspNetCore.8`
-- **WebView2 runtime**: built into Windows 10 and 11. If the window doesn't open: `winget install Microsoft.EdgeWebView2Runtime`
+- **WebView2 runtime**: built into Windows 11 and up-to-date Windows 10. The installer tells you if it's missing: `winget install Microsoft.EdgeWebView2Runtime`
 - Optional: an Elgato Stream Deck (the 15-key layout is what the plugin is made for)
 
-### From a release (easiest)
+Releases are self-contained: you don't need to install .NET.
 
-1. Download `WT-MFD-v<version>-win-x64.zip` from the [Releases](../../releases) page and unzip it anywhere, for example `Documents\WT-MFD`.
-2. Double-click **`Start MFD.cmd`** (or `app\WT-MFD.exe`).
-3. Start War Thunder. The MFD goes from **NO LINK** to **HANGAR**, then comes alive when you're in an aircraft.
-4. Optional: open `app\settings.json` and set `Callsign` to your in-game name (see [Settings](#settings)).
-5. Optional: install the [Stream Deck plugin](#stream-deck).
+### Installer (recommended)
+
+1. Download **`WT-MFD-Setup-v<version>-win-x64.exe`** from the [Releases](../../releases) page.
+2. Run it. It installs for your Windows user only (no admin rights) into `%LOCALAPPDATA%\Programs\WT-MFD`, adds WT-MFD to the Start menu, and can install the Stream Deck plugin for you.
+3. Start **WT-MFD**, then War Thunder. The MFD goes from **NO LINK** to **HANGAR**, then comes alive when you're in an aircraft.
+4. Optional: open **WT-MFD settings** from the Start menu and set `Callsign` to your in-game name (see [Settings](#settings)).
+
+Installing a newer version over an old one keeps your settings. Uninstall from Windows Settings, Apps; that also removes the match logs and the Stream Deck plugin.
+
+**"Windows protected your PC"?** The installer isn't code-signed yet, so Windows SmartScreen may warn about it. Click **More info**, then **Run anyway**. Each release lists SHA256 checksums in `SHA256SUMS.txt`, and every release is built from this repository's source by [GitHub Actions](.github/workflows/release.yml), so you can see exactly what went into it.
+
+### Portable zip
+
+Prefer no installer? Download **`WT-MFD-v<version>-portable-win-x64.zip`**, unzip it to a folder you can write to (for example `Documents\WT-MFD`, not Program Files), and double-click **`Start MFD.cmd`**. Settings are in `app\settings.json`; the Stream Deck plugin installs with `streamdeck\Install Stream Deck plugin.cmd`.
 
 ### From source
 
@@ -132,7 +140,7 @@ The reward rules come from community measurements, not from Gaijin, and can chan
 
 The WT-MFD Stream Deck plugin draws each key's label live, straight from the MFD. The middle row relabels itself when you change page, and the current page is highlighted.
 
-1. Double-click **`streamdeck\Install Stream Deck plugin.cmd`**. It closes Stream Deck, installs the plugin and starts Stream Deck again.
+1. The installer does this for you (tick "Install the WT-MFD Stream Deck plugin"). Without the installer, double-click **`streamdeck\Install Stream Deck plugin.cmd`**. It closes Stream Deck, installs the plugin and starts Stream Deck again.
 2. In Stream Deck, find **WT-MFD** in the action list on the right.
 3. Drag **MFD Button** onto all 15 keys (14 inside a Stream Deck folder, where the top-left key is the back key). Each key sets itself up from its position:
    - row 1: pages on keys 2 to 5 (key 1 stays free for the folder back key)
@@ -184,7 +192,7 @@ Fixed commands also exist if you'd rather give a key one job, for example `page/
 
 ## Settings
 
-`app\settings.json` (next to `WT-MFD.exe`). Restart WT-MFD after changing it.
+`settings.json` next to `WT-MFD.exe` (Start menu: **WT-MFD settings**). Restart WT-MFD after changing it.
 
 | Setting | Default | What it does |
 |---|---|---|
@@ -201,7 +209,7 @@ Fixed commands also exist if you'd rather give a key one job, for example `page/
 
 ## Match logs
 
-While WT-MFD runs, it records what War Thunder sends into `app\logs\`, one file per match, named by date, time and aircraft: chat, the kill feed, mission objectives, the map every 30 seconds, flight data every 10 seconds, reward cycle events and errors. They are for finding bugs and building features from real matches. The newest 200 files are kept and a single file stops at 50 MB. Set `"Log": false` to turn it off.
+While WT-MFD runs, it records what War Thunder sends into the `logs` folder next to `WT-MFD.exe`, one file per match, named by date, time and aircraft: chat, the kill feed, mission objectives, the map every 30 seconds, flight data every 10 seconds, reward cycle events and errors. They are for finding bugs and building features from real matches. The newest 200 files are kept and a single file stops at 50 MB. Set `"Log": false` to turn it off.
 
 **Privacy:** match logs contain other players' names and chat messages. Don't publish them, and remove names before attaching a log to a bug report.
 
@@ -209,6 +217,7 @@ While WT-MFD runs, it records what War Thunder sends into `app\logs\`, one file 
 
 - **NO LINK while flying:** War Thunder must be running. Check that `http://localhost:8111` opens the game's web map in a browser.
 - **APP LINK LOST:** the page can't reach WT-MFD itself. Is `WT-MFD.exe` running?
+- **WT-MFD can't save its settings or logs:** it was put in a folder Windows protects (like Program Files). Use the installer, or unzip the portable version into your Documents.
 - **The window doesn't open:** install the WebView2 runtime (see [Requirements](#requirements)).
 - **The attitude indicator rolls the wrong way:** set `InvertAdiRoll` to `true` and restart the app.
 - **Nothing on some pages for some aircraft:** War Thunder reports different values per aircraft. Fields it doesn't send show `---` or `N/A`.
@@ -219,7 +228,7 @@ While WT-MFD runs, it records what War Thunder sends into `app\logs\`, one file 
 Needs the **.NET 8 SDK** (`winget install Microsoft.DotNet.SDK.8`) and, to change the front end, **TypeScript** (`npm install -g typescript`).
 
 - **Build and install:** close WT-MFD if it's running, then double-click **`Build exe.cmd`**. It builds into `app\` (keeping your `settings.json`) and puts **WT-MFD** on your desktop and in the Start menu.
-- **Package a release:** `"Package release.cmd" 0.1.0-preview` builds a clean zip into `dist\`.
+- **Package a release:** `"Package release.cmd" 0.1.0-preview` builds the portable zip and, with [Inno Setup 6](https://jrsoftware.org/isinfo.php) installed, the installer into `dist\`. Real releases are built by GitHub Actions when a `v*` tag is pushed (see [`.github/workflows/release.yml`](.github/workflows/release.yml)).
 - **Edit the front end:** change `source\ts\app.ts`, then run `tsc -p source\ts`. It compiles into `source\src\web\app.js`, which is embedded in the program, so rebuild afterwards. The compiled `app.js` is committed so the app builds without TypeScript.
 
 ### Project layout
@@ -234,6 +243,8 @@ Needs the **.NET 8 SDK** (`winget install Microsoft.DotNet.SDK.8`) and, to chang
 | `source\test\mockwt.py` | A fake War Thunder server for testing without the game |
 | `source\test\sdharness.py` | Pretends to be the Stream Deck app and saves the key faces as images |
 | `streamdeck\` | The Stream Deck plugin and its installer |
+| `installer\` | The Windows installer (Inno Setup script) and the disclaimer it shows |
+| `.github\workflows\release.yml` | Builds, tests and publishes releases |
 
 ### Testing without the game
 

@@ -12,3 +12,4 @@ First public preview.
 - Team call banners, with grid squares marked on the map
 - Air Simulator reward cycle timer (15-minute payout cycles, landing bonus, kills per cycle), with CYC RST and a live Stream Deck key
 - Match logs for debugging
+- Windows installer (per-user, no admin rights, optional Stream Deck plugin) and a portable zip, both self-contained (no .NET install needed), built and tested by GitHub Actions

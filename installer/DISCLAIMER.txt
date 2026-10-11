@@ -1,0 +1,17 @@
+WT-MFD: READ THIS BEFORE INSTALLING
+
+WT-MFD is an unofficial, fan-made tool. It is not made, endorsed, approved or supported by Gaijin Entertainment. War Thunder and related names are trademarks of Gaijin Entertainment.
+
+What it does and doesn't do
+WT-MFD only reads the data War Thunder itself publishes on localhost:8111 for its own browser map and instruments. It does not modify game files, inject code into the game, read game memory, send any input to the game, or automate anything.
+
+You use it at your own risk
+Gaijin has not approved this tool and can change its rules at any time. Gaijin may consider third-party software that reads game data and turns it into extra information (such as range, bearing, timers or aiming estimates) to give an unfair advantage, and may restrict or ban accounts that use it. Read War Thunder's current Terms of Service and decide for yourself. The author accepts no responsibility for any consequence of using WT-MFD, including account restrictions or bans. The software is provided "as is", without warranty of any kind (see the license on the next page).
+
+Why it exists
+WT-MFD was not made to gain an advantage in the game. It started as a personal challenge: to make use of the game's own data in a simulator cockpit, so flight information is readily available on a second screen and Stream Deck instead of being overlaid on the game. Please use it in that spirit.
+
+Privacy
+WT-MFD keeps match logs on this PC (app folder, "logs") that contain other players' names and chat. They never leave your PC unless you share them. Turn them off with "Log": false in settings.json.
+
+Source code, documentation and issues: https://github.com/ObiKanTV/WT-MFD
