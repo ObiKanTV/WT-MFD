@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>WT-MFD</AssemblyName>
+    <RootNamespace>WtMfd</RootNamespace>
+    <Version>0.1.0-preview</Version>
+    <!-- runs on .NET 8 or anything newer that is installed -->
+    <RollForward>Major</RollForward>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <IsTransformWebConfigDisabled>true</IsTransformWebConfigDisabled>
+    <DebugType Condition="'$(Configuration)' == 'Release'">none</DebugType>
+    <!-- a windowed program: no console window when started (start it with the console switch for the old console mode) -->
+    <OutputType>WinExe</OutputType>
+    <ApplicationIcon>wtmfd.ico</ApplicationIcon>
+  </PropertyGroup>
+  <!-- the app window draws the MFD with WebView2, the Edge engine built into Windows -->
+  <ItemGroup Condition="'$(WebView2Dir)' == ''">
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3856.49" />
+  </ItemGroup>
+  <!-- offline builds: point WebView2Dir at a folder holding Microsoft.Web.WebView2.Core.dll and WebView2Loader.dll -->
+  <ItemGroup Condition="'$(WebView2Dir)' != ''">
+    <Reference Include="Microsoft.Web.WebView2.Core" HintPath="$(WebView2Dir)\Microsoft.Web.WebView2.Core.dll" />
+    <None Include="$(WebView2Dir)\WebView2Loader.dll" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- the web page is compiled into the program, so the exe is the only file you need -->
+    <EmbeddedResource Include="web\*.*" LogicalName="web/%(Filename)%(Extension)" />
+    <Content Remove="web\**" />
+    <None Include="settings.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+    <None Include="wtmfd.ico" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  </ItemGroup>
+</Project>

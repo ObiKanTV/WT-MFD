@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WT-MFD</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="frame" class="pal-green">
+  <div class="osbrow" id="osb-top"></div>
+  <div id="screen">
+    <header id="hdr">
+      <span id="h-ac">NO AIRCRAFT</span>
+      <span id="h-page">FLT</span>
+      <span id="h-right"><span id="h-cyc" class="cyc dim" title="Air Sim reward cycle. Click (or CYC RST) to restart it">CYC --:--</span><span id="h-warn"></span><span id="h-status">OFFLINE</span></span>
+    </header>
+    <div id="callout"></div>
+    <main id="pages">
+      <section id="p-flight" class="page">
+        <div class="col left">
+          <div class="cell"><div class="lbl" id="f-spd-l">IAS</div><div class="val big" id="f-spd">---</div><div class="unit" id="f-spd-u">KM/H</div></div>
+          <div class="cell"><div class="lbl">MACH</div><div class="val" id="f-mach">-.--</div></div>
+          <div class="cell"><div class="lbl">ALT</div><div class="val big" id="f-alt">-----</div><div class="unit" id="f-alt-u">M</div></div>
+          <div class="cell"><div class="lbl">V/S</div><div class="val" id="f-vs">---</div><div class="unit" id="f-vs-u">M/S</div></div>
+        </div>
+        <div class="center"><canvas id="adi"></canvas><div id="f-nav"></div></div>
+        <div class="col right">
+          <div class="cell"><div class="lbl">AOA</div><div class="val big" id="f-aoa">--.-</div><div class="unit">DEG</div></div>
+          <div class="cell"><div class="lbl">G</div><div class="val big" id="f-g">-.-</div><div class="unit" id="f-gmm">MIN -.- MAX -.-</div></div>
+          <div class="cell"><div class="lbl">HDG</div><div class="val" id="f-hdg">---</div></div>
+          <div class="cell"><div class="lbl">THR</div><div class="val" id="f-thr">---</div><div class="unit">%</div></div>
+        </div>
+      </section>
+
+      <section id="p-engine" class="page">
+        <div class="fuelcol">
+          <div class="lbl">FUEL</div>
+          <div id="e-bar"><div id="e-fill"></div><div id="e-bingo"></div></div>
+          <div class="unit" id="e-pct">--%</div>
+        </div>
+        <div class="fuelinfo">
+          <div class="row"><span class="lbl">FUEL</span><span class="val" id="e-fuel">----</span><span class="unit" id="e-fuel-u">KG</span></div>
+          <div class="row"><span class="lbl">BURN</span><span class="val" id="e-burn">--</span><span class="unit" id="e-burn-u">KG/MIN</span></div>
+          <div class="row"><span class="lbl">ENDUR</span><span class="val" id="e-end">--:--</span><span class="unit">MIN:S</span></div>
+          <div class="row"><span class="lbl">BINGO</span><span class="val" id="e-bingo-v">----</span><span class="unit" id="e-bingo-u">KG</span></div>
+          <div class="row"><span class="lbl">TO BINGO</span><span class="val" id="e-tobingo">--:--</span><span class="unit">MIN:S</span></div>
+        </div>
+        <table id="e-eng"></table>
+      </section>
+
+      <section id="p-map" class="page">
+        <canvas id="map"></canvas>
+        <div id="map-hud"></div>
+        <div id="map-msn"></div>
+        <div id="map-wp"></div>
+      </section>
+
+      <section id="p-systems" class="page">
+        <div id="s-lamps"></div>
+        <div class="lbl block">MISSION</div>
+        <div id="s-mission"></div>
+        <div class="lbl block" id="s-log-l">EVENTS · ALL</div>
+        <div id="s-log"></div>
+      </section>
+
+      <div id="nodata"><div id="nodata-t">NO LINK</div><div id="nodata-s">START WAR THUNDER</div></div>
+    </main>
+  </div>
+  <div class="osbrow" id="osb-bot"></div>
+  <div class="osbrow small" id="osb-glob"></div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>

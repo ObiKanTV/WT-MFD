@@ -1,0 +1,36 @@
+{
+  "Actions": [
+    {
+      "Icon": "imgs/action",
+      "Name": "MFD Button",
+      "States": [
+        {
+          "Image": "imgs/key",
+          "ShowTitle": false
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "A WT-MFD button that shows its live label. Drop it on all 15 keys: each key picks its MFD button from its position.",
+      "UUID": "com.kai.wtmfd.button",
+      "PropertyInspectorPath": "pi.html"
+    }
+  ],
+  "Author": "Kai",
+  "Category": "WT-MFD",
+  "CategoryIcon": "imgs/category",
+  "CodePath": "plugin.html",
+  "Description": "Live War Thunder MFD buttons for WT-MFD",
+  "Icon": "imgs/plugin",
+  "Name": "WT-MFD",
+  "SDKVersion": 2,
+  "Software": {
+    "MinimumVersion": "5.0"
+  },
+  "OS": [
+    {
+      "Platform": "windows",
+      "MinimumVersion": "10"
+    }
+  ],
+  "Version": "1.3.0.0"
+}

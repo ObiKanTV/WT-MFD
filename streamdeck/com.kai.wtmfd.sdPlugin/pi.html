@@ -1,0 +1,55 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>WT-MFD button</title>
+<style>
+  body { margin: 0; padding: 8px 10px; background: #2d2d2d; color: #d8d8d8; font: 9pt "Segoe UI", sans-serif; }
+  .row { display: flex; align-items: center; margin: 6px 0; }
+  .row label { width: 95px; color: #969696; }
+  select, input { flex: 1; background: #3d3d3d; color: #d8d8d8; border: 0; padding: 4px 6px; font: inherit; }
+  p { color: #969696; margin: 10px 0 0; line-height: 1.4; }
+</style>
+</head>
+<body>
+  <div class="row"><label for="cmd">MFD button</label><select id="cmd"></select></div>
+  <div class="row"><label for="base">WT-MFD address</label><input id="base" placeholder="http://127.0.0.1:8120"></div>
+  <p>Keys pick their button from their position when first placed: row 1 = pages, row 2 = page buttons (they change with the MFD page), row 3 = display. Change it here if you want something else.</p>
+<script>
+  const CMDS = [
+    ["osb/t2", "Top 2 (FLT page)"], ["osb/t3", "Top 3 (ENG page)"], ["osb/t4", "Top 4 (MAP page)"], ["osb/t5", "Top 5 (SYS page)"],
+    ["osb/b1", "Bottom 1 (changes with page)"], ["osb/b2", "Bottom 2 (changes with page)"], ["osb/b3", "Bottom 3 (changes with page)"],
+    ["osb/b4", "Bottom 4 (changes with page)"], ["osb/b5", "Bottom 5 (changes with page)"],
+    ["osb/g1", "Third row 1 (changes with page)"], ["osb/g2", "Third row 2 (changes with page)"], ["osb/g3", "Third row 3 (changes with page)"], ["osb/g4", "Third row 4 (changes with page)"], ["osb/g5", "Third row 5 (changes with page)"],
+    ["page/flight", "Flight page"], ["page/engine", "Engine page"], ["page/map", "Map page"], ["page/systems", "Systems page"],
+    ["page/next", "Next page"], ["page/prev", "Previous page"],
+    ["map/zoomin", "Map zoom in"], ["map/zoomout", "Map zoom out"], ["map/follow", "Map follow / full"], ["map/grid", "Map grid"], ["map/trail", "Map trail"], ["map/mission", "Map mission objectives"],
+    ["fuel/bingo-up", "Bingo +100 kg"], ["fuel/bingo-down", "Bingo -100 kg"], ["fuel/reset", "Reset burn rate"],
+    ["g/reset", "Reset G min/max"], ["speed/toggle", "IAS / TAS"], ["events/filter", "Event filter"], ["events/clear", "Clear events"],
+    ["display/night", "Night mode"], ["display/dim", "Dimmer"], ["display/bright", "Brighter"], ["display/color", "Next colour"], ["display/units", "Units"],
+    ["wp/next", "Waypoint: remove the active one"], ["wp/clear", "Waypoints: clear all"],
+    ["tgt/next", "Target: next enemy target"], ["tgt/clear", "Target: deselect"], ["wpn/next", "Hold-over: next weapon profile / off"], ["cycle/reset", "Air Sim reward cycle: live countdown, press = restart"], ["cycle/stop", "Air Sim reward cycle: off"],
+    ["fuel/bingo-down-500", "Bingo -500 kg"], ["fuel/bingo-up-500", "Bingo +500 kg"], ["fuel/bingo-25", "Bingo 25% of full fuel"],
+  ];
+  const sel = document.getElementById("cmd"), base = document.getElementById("base");
+  CMDS.forEach(([v, t]) => { const o = document.createElement("option"); o.value = v; o.textContent = t; sel.appendChild(o); });
+
+  let ws, uuid, settings = {};
+  function connectElgatoStreamDeckSocket(port, inUuid, registerEvent, info, actionInfo) {
+    uuid = inUuid;
+    try { settings = (JSON.parse(actionInfo).payload || {}).settings || {}; } catch (e) { settings = {}; }
+    sel.value = settings.cmd || "osb/t2";
+    base.value = settings.base || "";
+    ws = new WebSocket("ws://127.0.0.1:" + port);
+    ws.onopen = () => ws.send(JSON.stringify({ event: registerEvent, uuid }));
+  }
+  function save() {
+    settings.cmd = sel.value;
+    settings.base = base.value.trim();
+    if (ws && ws.readyState === 1) ws.send(JSON.stringify({ event: "setSettings", context: uuid, payload: settings }));
+  }
+  sel.addEventListener("change", save);
+  base.addEventListener("change", save);
+</script>
+</body>
+</html>

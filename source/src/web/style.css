@@ -1,0 +1,164 @@
+:root { --u: min(1vh, 1vw); }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: #000; overflow: hidden; }
+body { display: grid; place-items: center; font-family: Consolas, "Cascadia Mono", "DejaVu Sans Mono", monospace; }
+
+/* phosphor palettes */
+.pal-green { --fg: #46ff7e; --dim: #1f8a45; --faint: #0d3b1d; --warn: #ffb020; --alert: #ff4a3d; --bg: #020704; }
+.pal-amber { --fg: #ffb52e; --dim: #9a6a14; --faint: #3d2a07; --warn: #ffe066; --alert: #ff4a3d; --bg: #070402; }
+.pal-white { --fg: #e9f1f5; --dim: #8a979e; --faint: #2b3236; --warn: #ffb020; --alert: #ff4a3d; --bg: #040506; }
+
+#frame {
+  width: calc(var(--u) * 100); height: calc(var(--u) * 100);
+  background: #0b0c0d; border: calc(var(--u) * 0.6) solid #1b1d1f; border-radius: calc(var(--u) * 2.5);
+  display: grid; grid-template-rows: 7% 1fr 7% 5%; padding: calc(var(--u) * 1.2) calc(var(--u) * 2);
+  color: var(--fg); transition: filter .2s;
+}
+
+/* option select buttons, labelled like a real MFD bezel */
+.osbrow { display: grid; grid-template-columns: repeat(5, 1fr); gap: calc(var(--u) * 2); align-items: center; }
+.osb {
+  height: 70%; border-radius: calc(var(--u) * .8); background: linear-gradient(#2a2d30, #17191b);
+  border: 1px solid #34383c; color: var(--dim); display: grid; place-items: center;
+  font-size: calc(var(--u) * 1.9); letter-spacing: .08em; cursor: pointer; user-select: none;
+}
+.osb.on { color: var(--fg); box-shadow: inset 0 0 0 1px var(--dim); }
+.osb.empty { color: transparent; }
+.osb.flash { background: #3a3f44; }
+.osbrow.small .osb { height: 62%; font-size: calc(var(--u) * 1.5); }
+
+#screen {
+  background: var(--bg); border-radius: calc(var(--u) * 1); border: 1px solid #000;
+  box-shadow: inset 0 0 calc(var(--u) * 4) rgba(0,0,0,.9);
+  display: grid; grid-template-rows: auto 1fr; overflow: hidden; position: relative; margin: calc(var(--u) * .6) 0;
+}
+#hdr {
+  display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: calc(var(--u) * .8) calc(var(--u) * 1.6);
+  border-bottom: 1px solid var(--faint); font-size: calc(var(--u) * 2); letter-spacing: .1em;
+}
+#h-page { color: var(--fg); font-weight: bold; }
+#h-ac, #h-status { color: var(--dim); }
+#h-right { text-align: right; }
+#h-warn { color: var(--alert); margin-right: calc(var(--u) * 1.5); font-weight: bold; }
+/* Air Sim reward cycle: C2 11:42 K1 LAND */
+.cyc { margin-right: calc(var(--u) * 1.8); color: var(--fg); font-variant-numeric: tabular-nums; cursor: pointer; }
+.cyc.dim { color: var(--dim); }
+.blink { animation: blink 1s steps(2, start) infinite; }
+@keyframes blink { to { visibility: hidden; } }
+
+#pages { position: relative; overflow: hidden; }
+.page { position: absolute; inset: 0; display: none; padding: calc(var(--u) * 1.6); }
+.page.on { display: grid; }
+
+.lbl { color: var(--dim); font-size: calc(var(--u) * 1.8); letter-spacing: .12em; }
+.lbl.block { margin: calc(var(--u) * 1.2) 0 calc(var(--u) * .6); border-bottom: 1px solid var(--faint); }
+.val { font-size: calc(var(--u) * 4.2); line-height: 1.05; font-variant-numeric: tabular-nums; }
+.val.big { font-size: calc(var(--u) * 5.6); }
+.unit { color: var(--dim); font-size: calc(var(--u) * 1.5); letter-spacing: .1em; }
+.warnc { color: var(--warn) !important; }
+.alertc { color: var(--alert) !important; }
+
+/* flight */
+#p-flight { grid-template-rows: minmax(0, 1fr); grid-template-columns: 23% 1fr 23%; gap: calc(var(--u) * 1.4); }
+#p-flight .col { min-height: 0; display: grid; grid-template-rows: repeat(4, 1fr); gap: calc(var(--u) * 1); }
+#p-flight .cell { border: 1px solid var(--faint); border-radius: calc(var(--u) * .5); padding: calc(var(--u) * .8) calc(var(--u) * 1); }
+#p-flight .right .cell { text-align: right; }
+#p-flight .center { position: relative; }
+canvas { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* engine and fuel */
+#p-engine { grid-template-columns: 18% 1fr; grid-template-rows: 1fr auto; gap: calc(var(--u) * 2); }
+.fuelcol { display: grid; grid-template-rows: auto 1fr auto; justify-items: center; gap: calc(var(--u) * .6); }
+#e-bar { position: relative; width: 50%; border: 1px solid var(--dim); border-radius: calc(var(--u) * .4); }
+#e-fill { position: absolute; left: 2px; right: 2px; bottom: 2px; background: var(--dim); }
+#e-bingo { position: absolute; left: -30%; right: -30%; height: 0; border-top: 2px dashed var(--warn); }
+.fuelinfo { display: grid; align-content: start; gap: calc(var(--u) * 1); }
+.fuelinfo .row { display: grid; grid-template-columns: 32% 1fr auto; align-items: baseline; border-bottom: 1px solid var(--faint); padding-bottom: calc(var(--u) * .4); }
+.fuelinfo .val { text-align: right; padding-right: calc(var(--u) * 1); }
+#e-eng { grid-column: 1 / -1; border-collapse: collapse; width: 100%; font-size: calc(var(--u) * 2.3); font-variant-numeric: tabular-nums; }
+#e-eng th { color: var(--dim); font-weight: normal; font-size: calc(var(--u) * 1.6); text-align: right; padding: calc(var(--u) * .4); letter-spacing: .1em; }
+#e-eng th:first-child, #e-eng td:first-child { text-align: left; color: var(--dim); font-size: calc(var(--u) * 1.6); }
+#e-eng td { text-align: right; padding: calc(var(--u) * .4); border-top: 1px solid var(--faint); }
+
+/* map */
+#p-map { padding: 0; }
+#p-flight .cell { min-height: 0; overflow: hidden; }
+#map-hud { position: absolute; left: calc(var(--u) * 1.4); bottom: calc(var(--u) * 1); font-size: calc(var(--u) * 1.6); color: var(--fg); text-shadow: 0 0 4px #000, 0 0 2px #000; letter-spacing: .08em; }
+
+/* systems */
+#p-systems { grid-template-rows: auto auto auto auto 1fr; }
+#s-lamps { display: grid; grid-template-columns: repeat(4, 1fr); gap: calc(var(--u) * 1.4); }
+.lamp { border: 1px solid var(--faint); border-radius: calc(var(--u) * .5); padding: calc(var(--u) * 1) calc(var(--u) * .8); text-align: center; }
+.lamp .lv { font-size: calc(var(--u) * 3); margin-top: calc(var(--u) * .3); }
+.lamp.lit { border-color: var(--fg); }
+.lamp.lit .lv { color: var(--fg); }
+.lamp.mid { border-color: var(--warn); }
+.lamp.mid .lv { color: var(--warn); }
+.lamp.off .lv { color: var(--dim); }
+#s-mission { font-size: calc(var(--u) * 1.6); display: grid; grid-template-columns: 1fr 1fr; column-gap: calc(var(--u) * 2); max-height: calc(var(--u) * 13); overflow: hidden; }
+#s-mission div { padding: calc(var(--u) * .1) 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#s-mission .more { color: var(--dim); }
+#s-mission .done { color: var(--dim); text-decoration: line-through; }
+#s-mission .failed { color: var(--alert); }
+#s-log { min-height: 0; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; font-size: calc(var(--u) * 1.9); }
+#s-log div { flex-shrink: 0; line-height: 1.4; padding: calc(var(--u) * .1) 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#s-log .sys { color: var(--dim); opacity: .7; }
+#s-log .t { color: var(--dim); margin-right: calc(var(--u) * 1); }
+#s-log .chat { color: var(--dim); }
+#s-log .chat b { color: var(--fg); font-weight: normal; }
+#s-log .enemy b { color: var(--alert); }
+#s-log .me { color: var(--warn); }
+
+/* nothing to show */
+#nodata { position: absolute; inset: 0; display: none; place-content: center; text-align: center; background: var(--bg); }
+#nodata.on { display: grid; }
+#nodata-t { font-size: calc(var(--u) * 5); color: var(--dim); letter-spacing: .2em; }
+#nodata-s { font-size: calc(var(--u) * 2); color: var(--faint); margin-top: calc(var(--u) * 1); letter-spacing: .15em; }
+
+/* team call banner: teammates' quick-chat and team chat, on every page for a few seconds */
+#callout { position: absolute; z-index: 5; left: 50%; top: calc(var(--u) * 5.2); transform: translateX(-50%); max-width: 92%;
+  display: none; padding: calc(var(--u) * .6) calc(var(--u) * 1.6); border: 2px solid var(--fg); border-radius: calc(var(--u) * .4);
+  background: rgba(0,0,0,.82); color: var(--fg); font-size: calc(var(--u) * 2.2); letter-spacing: .06em; text-transform: uppercase;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; box-shadow: 0 0 calc(var(--u) * 1.2) var(--fg); }
+#callout.on { display: block; animation: callout-in .25s ease-out; }
+#callout b { margin-right: calc(var(--u) * 1); }
+@keyframes callout-in { from { opacity: 0; transform: translate(-50%, -30%); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+/* mission list over the map (MSN button) */
+#map-msn { position: absolute; right: calc(var(--u) * 1); bottom: calc(var(--u) * 1); display: none; max-width: 46%;
+  padding: calc(var(--u) * .6) calc(var(--u) * 1); background: rgba(0,0,0,.72); border: 1px solid var(--faint);
+  border-radius: calc(var(--u) * .4); font-size: calc(var(--u) * 1.5); color: var(--fg); pointer-events: none; }
+#map-msn.on { display: block; }
+#map-msn div { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: calc(var(--u) * .1) 0; }
+#map-msn .done { color: var(--dim); text-decoration: line-through; }
+#map-msn .failed { color: var(--alert, #ff5050); }
+#map-msn .more { color: var(--dim); }
+
+/* ---------- running as the WT-MFD app (its own borderless window) ----------
+   A slim strip on top holds the window buttons; the strip and the bezel move the window (drag),
+   double-click fills the screen. The MFD buttons stay clickable. */
+body.app { --strip: 26px; --u: min(calc((100vh - var(--strip)) / 100), 1vw); padding-top: var(--strip); background: #0b0c0d;
+  app-region: drag; -webkit-app-region: drag; user-select: none; }
+body.app .osb, body.app #winctl button, body.app #map, body.app #h-cyc { app-region: no-drag; -webkit-app-region: no-drag; }
+#winctl, #wintitle { display: none; }
+body.app #winctl { display: flex; position: fixed; top: 3px; right: 6px; gap: 2px; z-index: 50; }
+body.app #wintitle { display: block; position: fixed; top: 5px; left: 12px; font-size: 12px; letter-spacing: .25em; color: #3a4044; }
+#winctl button { width: 34px; height: 20px; border: 0; border-radius: 4px; background: transparent; color: #6c757a;
+  font: 13px/20px "Segoe UI Symbol", Consolas, monospace; padding: 0; }
+#winctl button:hover { background: #24272a; color: #e9f1f5; }
+#winctl button.x:hover { background: #c42b1c; color: #fff; }
+
+/* waypoint readout (top left of the map) */
+#map { cursor: crosshair; }
+#map-wp { position: absolute; left: calc(var(--u) * 1); bottom: calc(var(--u) * 4); display: none; pointer-events: none;
+  padding: calc(var(--u) * .6) calc(var(--u) * 1); background: rgba(0,0,0,.75); border: 1px solid var(--dim);
+  border-radius: calc(var(--u) * .4); font-size: calc(var(--u) * 1.7); color: var(--fg); letter-spacing: .04em; }
+#map-wp.on { display: block; }
+#map-wp b { color: var(--fg); }
+#map-wp div + div { color: var(--fg); opacity: .9; }
+#callout { pointer-events: none; }
+
+/* FLT: distance and bearing to the selected target / active waypoint, under the attitude indicator */
+#f-nav { position: absolute; left: 0; right: 0; bottom: 0; text-align: center; font-size: calc(var(--u) * 1.6); color: var(--warn);
+  letter-spacing: .05em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+#map-wp b.tgt { color: var(--warn); }

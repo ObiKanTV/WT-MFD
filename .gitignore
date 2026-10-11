@@ -1,0 +1,22 @@
+# build output
+bin/
+obj/
+app/
+dist/
+*.dll.new
+
+# personal data: match logs hold other players' names and chat
+logs/
+source/test/shots/
+
+# local backups and editor files
+backup/
+.vs/
+.vscode/
+*.user
+*.suo
+node_modules/
+__pycache__/
+*.pyc
+Thumbs.db
+desktop.ini

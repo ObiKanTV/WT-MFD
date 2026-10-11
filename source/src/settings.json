@@ -1,0 +1,31 @@
+{
+  // Port the MFD page and the Stream Deck commands use: http://localhost:8120
+  "Port": 8120,
+
+  // Where War Thunder publishes its data. Leave as is unless you changed it.
+  "WarThunderUrl": "http://localhost:8111",
+
+  // true = tablets/phones on your home network can open the MFD too. false = this PC only.
+  "Lan": false,
+
+  // Your in-game name. Event log lines that mention you are highlighted.
+  "Callsign": "",
+
+  // Starting bingo fuel in kg (adjust in flight with the Stream Deck).
+  "DefaultBingoKg": 1000,
+
+  // Flip these if the attitude indicator turns the wrong way.
+  "InvertAdiPitch": false,
+  "InvertAdiRoll": false,
+
+  // true = the MFD opens in its own app window. false = console window, open the MFD in a browser yourself.
+  "Window": true,
+
+  // Hold-over estimate on the FLT page for unguided weapons (the game doesn't say which weapon is selected,
+  // so profiles are picked by aircraft name and cycled with the FLT third-row button).
+  // AvgSpeed = average speed over the flight in m/s, PitchOffset = degrees to add for how the launchers sit,
+  // MaxRange = metres. If salvos land short: lower AvgSpeed (or raise PitchOffset). Long: the opposite.
+  "Weapons": [
+    { "Aircraft": "mi_28", "Name": "S-8KO", "AvgSpeed": 650, "PitchOffset": -1.8, "MaxRange": 6000 }
+  ]
+}
